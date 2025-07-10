@@ -96,11 +96,18 @@ Until then, please use this tool only in trusted or isolated environments.
 ## 📁 Sample Folder Layout
 
 C:\wamp64\www
+
 ├── app1
+
 │ └── error.log
+
 ├── app2
+
 │ └── logs
+
 │ └── debug.log
+
 └── LogViewer
+
 └── index.html
 
