@@ -1,221 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Log Folder Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Page</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
 
   <style>
     body {
       font-family: 'Nunito', sans-serif;
-      background-color: #f8f9fa;
-    }
-
-    body.no-scroll {
-      overflow: hidden;
-    }
-
-    #search-container {
-      max-width: 400px;
-      margin: 30px auto;
-    }
-
-    .card-custom {
-      transition: transform 0.3s ease;
-      color: white;
-      height: 100%;
-      min-width: 180px;
-    }
-
-    .card-custom:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    }
-
-    #card-container {
-      margin: 0 auto !important;
-    }
-
-    .card-img-container {
-      height: 120px;
+      background: #dfdfdf;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
-    .card-img-container img {
-      max-height: 80px;
-    }
-
-    .card-title {
-      text-align: center;
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-
-    .bg-color-0 { background-color: #007bff; }
-    .bg-color-1 { background-color: #28a745; }
-    .bg-color-2 { background-color: #ffc107; color: black; }
-    .bg-color-3 { background-color: #dc3545; }
-    .bg-color-4 { background-color: #6610f2; }
-
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
+    #container {
+      max-width: 440px;
       width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      overflow-y: auto;
-      padding: 40px 0;
+      padding: 30px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    #overlay-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 800px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      max-height: 90vh;
-      overflow-y: auto;
+    .input-field {
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
+      transition: 0.3s;
+      padding-left: 25px;
+      height: 50px;
     }
 
-    #log {
-      margin-top: 20px;
+    .input-field:focus {
+      box-shadow: 0px 0px 5px 1px #b3b3b3;
     }
 
-    .close-btn {
+    .submit-btn {
+      width: 100%;
+      height: 45px;
+      background: #222;
+      border: none;
+      border-radius: 30px;
+      color: #fff;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: #000;
+      transform: scale(1.03);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
-      float: right;
-      font-size: 1.3rem;
+      font-size: 18px;
       color: #000;
     }
 
-    .class {
+    .sign-up-link a {
       font-weight: 600;
-      color: #333;
-      margin-bottom: 20px;
+      color: #000;
+    }
+
+    @media (max-width: 768px) {
+      .input-field {
+        height: 45px;
+      }
+
+      .submit-btn {
+        height: 40px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2 class="text-center mt-4">Log Folders</h2>
+  <section id="container">
+    <div class="login-box">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold">Login</h3>
+      </div>
 
-    <div id="search-container">
-      <input type="text" id="search" class="form-control" placeholder="Search folders ...">
-    </div>
+      <div class="mb-3">
+        <input type="text" class="form-control input-field" placeholder="Email" autocomplete="off" required />
+      </div>
 
-    <div class="d-flex gap-5 flex-wrap justify-content-center pb-5" id="card-container"></div>
+      <div class="mb-3 position-relative">
+        <input type="password" class="form-control input-field" id="password" placeholder="Password" autocomplete="off" required />
+        <span class="toggle-password" onclick="togglePassword()">
+          <i class="fa-solid fa-eye"></i>
+        </span>
+      </div>
 
-    <div id="overlay">
-      <div id="overlay-content">
-        <span class="close-btn">&times;</span>
-        <div class="row mt-4" id="log">
-          <div class="col-md-4">
-            <h5>Log Files</h5>
-            <ul id="log-file-list" class="list-group"></ul>
-          </div>
-          <div class="col-md-8">
-            <h5>File Preview</h5>
-            <pre id="log-preview" style="background:#f8f9fa; padding:10px; border:1px solid #ccc; height:400px; overflow:auto;"></pre>
-          </div>
-        </div>
+      <div class="d-flex justify-content-center mb-3">
+        <a href="#" class="text-decoration-none text-secondary small">Forgot password?</a>
+      </div>
+
+      <div class="mb-3">
+        <button class="submit-btn" type="submit">Sign In</button>
+      </div>
+
+      <div class="text-center sign-up-link">
+        <p class="mb-0">Don't have an account? <a href="#">Sign Up</a></p>
       </div>
     </div>
-  </div>
+  </section>
 
   <script>
-    const bgClasses = ['bg-color-0', 'bg-color-1', 'bg-color-2', 'bg-color-3', 'bg-color-4'];
-    const imageSrc = 'https://cdn-icons-png.flaticon.com/512/2991/2991108.png';
+    function togglePassword() {
+      const passwordField = document.getElementById('password');
+      const icon = event.currentTarget.querySelector('i');
+      const isPassword = passwordField.getAttribute('type') === 'password';
+      passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    }
 
-    $(document).ready(function () {
-      $('#overlay').hide();
-
-      $.post('backend.php', { action: 'getLogFolders' }, function (response) {
-        const folders = JSON.parse(response);
-        const container = $('#card-container');
-
-        folders.forEach((folder, i) => {
-          const bgClass = bgClasses[i % bgClasses.length];
-          const card = `
-            <div class="card card-custom ${bgClass} logcard" data-folder="${folder}">
-              <div class="card-img-container">
-                <img src="${imageSrc}" alt="Folder Icon" class="img-fluid">
-              </div>
-              <div class="card-body p-2 d-flex justify-content-center align-items-center">
-                <div class="card-title">${folder}</div>
-              </div>
-            </div>
-          `;
-          container.append(card);
-        });
-
-        $('.card-custom').on('click', function () {
-          const folder = $(this).data('folder');
-          $('#log-file-list').empty();
-          $('#log-preview').text('');
-          $('#overlay').show();
-          $('body').addClass('no-scroll');
-
-          $.post('backend.php', { action: 'getLogFiles', folder }, function (files) {
-            const logFiles = JSON.parse(files);
-            if (logFiles.length === 0) {
-              $('#log-file-list').append('<li class="list-group-item">No .log files found.</li>');
-              return;
-            }
-
-            logFiles.forEach(file => {
-              $('#log-file-list').append(`<li class="list-group-item list-group-item-action log-file" data-folder="${folder}" data-file="${file}">${file}</li>`);
-            });
-
-            $('.log-file').on('click', function () {
-              const folder = $(this).data('folder');
-              const file = $(this).data('file');
-
-              $.post('backend.php', { action: 'readLogFile', folder, file }, function (content) {
-                $('#log-preview').text(content);
-              });
-            });
-          });
-        });
-      });
-
-      $('#search').on('input', function () {
-        const keyword = $(this).val().toLowerCase();
-        $('.logcard').each(function () {
-          const title = $(this).find('.card-title').text().toLowerCase();
-          $(this).toggle(title.includes(keyword));
-        });
-      });
-
-      function closeOverlay() {
-        $('#overlay').hide();
-        $('body').removeClass('no-scroll');
-      }
-
-      $('.close-btn').on('click', closeOverlay);
-
-      $('#overlay').on('click', function (e) {
-        if ($(e.target).is('#overlay')) {
-          closeOverlay();
-        }
-      });
-
-      $(document).keyup(function (e) {
-        if (e.key === "Escape") {
-          closeOverlay();
-        }
-      });
-    });
+    
   </script>
+
 </body>
 </html>
