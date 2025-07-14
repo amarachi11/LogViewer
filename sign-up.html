@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Sign Up Page</title>
+</head>
+<body>
+    <section id="container">
+        <div class="login-box">
+            <div class="login-header">
+                <header>Sign Up</header>
+            </div>
+            <div class="input-box">
+                <input type="text" class="input-field" placeholder="Full Name" autocomplete="off" required>
+            </div>
+            <div class="input-box">
+                <input type="email" class="input-field" placeholder="Email" autocomplete="off" required>
+            </div>
+            <div class="input-box password-box">
+                <input type="text" class="input-field" id="password-signup" placeholder="Password" autocomplete="off" required>
+                <span class="toggle-password" onclick="togglePassword('password-signup', this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+            <div class="input-box password-box">
+                <input type="text" class="input-field" id="confirm-password-signup" placeholder="Confirm Password" autocomplete="off" required>
+                <span class="toggle-password" onclick="togglePassword('confirm-password-signup', this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+            
+            <div class="input-submit">
+                <button class="submit-btn" id="submit-signup"></button>
+                <label for="submit-signup">Register</label>
+            </div>
+            <div class="sign-up-link">
+                <p>Already have an account? <a href="">Sign In</a></p>
+            </div>
+        </div>
+
+        <script>
+            function togglePassword(fieldId, el) {
+                const passwordField = document.getElementById(fieldId);
+                const icon = el.querySelector('i');
+                if (passwordField.getAttribute('type') === 'text') {
+                    passwordField.setAttribute('type', 'password');
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordField.setAttribute('type', 'text');
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        </script>
+    </section>
+</body>
+</html>
