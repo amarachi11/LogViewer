@@ -39,6 +39,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'readLogFile':
             readSelectedLogFile();
             break;
+        case 'getUsers':
+            getUsers();
+            break;
+        case 'getPendingUsers':
+            getPendingUsers();
+            break;
+        case 'getUser':
+            getUser();
+            break;
+        case 'updateUser':
+            updateUser();
+            break;
+        case 'updateUserStatus':
+            updateUserStatus();
+            break;
+
 
         default:
             echo json_encode(['error' => 'Invalid action']);
@@ -230,4 +246,45 @@ function readSelectedLogFile() {
     }
 
     echo file_get_contents($fullPath);
+}
+
+
+function getUsers() {
+    $pdo = dbConnect();
+    $stmt = $pdo->query("SELECT email, role, status FROM users WHERE status NOT IN ('pending', 'declined') ORDER BY email");
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function getPendingUsers() {
+    $pdo = dbConnect();
+    $stmt = $pdo->prepare("SELECT email FROM users WHERE status = 'pending'");
+    $stmt->execute();
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function getUser() {
+    $email = $_POST['email'] ?? '';
+    $pdo = dbConnect();
+    $stmt = $pdo->prepare("SELECT email, role, status FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+}
+
+function updateUser() {
+    $email = $_POST['email'];
+    $role = $_POST['role'];
+    $status = $_POST['status'];
+    $pdo = dbConnect();
+    $stmt = $pdo->prepare("UPDATE users SET role = ?, status = ? WHERE email = ?");
+    $stmt->execute([$role, $status, $email]);
+    echo json_encode(['status' => 'ok']);
+}
+
+function updateUserStatus() {
+    $email = $_POST['email'];
+    $status = $_POST['status'];
+    $pdo = dbConnect();
+    $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE email = ?");
+    $stmt->execute([$status, $email]);
+    echo json_encode(['status' => 'ok']);
 }
