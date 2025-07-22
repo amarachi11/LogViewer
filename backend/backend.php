@@ -1,5 +1,22 @@
 <?php
 
+session_start();
+$timeout = 60;
+
+if (!isset($_SESSION['user'])) {
+    echo json_encode(['error' => 'not_logged_in']);
+    exit;
+}
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
+    session_unset();
+    session_destroy();
+    echo json_encode(['error' => 'timeout']);
+    exit;
+}
+
+$_SESSION['last_activity'] = time();
+
 require __DIR__ . '/../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

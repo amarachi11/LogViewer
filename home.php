@@ -1,3 +1,19 @@
+<?php
+session_start();
+$timeout = 7200;
+if (!isset($_SESSION['user'])) {
+    header("Location: index.html");
+    exit;
+}
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: index.html?timeout=1");
+    exit;
+}
+$_SESSION['last_activity'] = time();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,15 +159,15 @@
 <body>
 
   <!-- Centered global loading spinner -->
-  <div id="ajax-loader">
+  <!-- <div id="ajax-loader">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
-  </div>
+  </div> -->
 
   <div class="container">
     <div class="d-flex justify-content-end align-items-center mt-4 mb-3">
-      <button id="logout-btn" class="btn ">Log Out</button>
+      <a href="backend/logout.php" class="btn btn-danger">Log out</a>
     </div>
     <h2 class="text-center mt-4">Log Folders</h2>
 
@@ -179,6 +195,25 @@
   </div>
 
   <script>
+// AutoLogout functionality
+    let autoLogoutTimer;
+  const AUTO_LOGOUT_SECONDS = 7200; //match php timeout
+
+  function resetAutoLogoutTimer() {
+  clearTimeout(autoLogoutTimer);
+  autoLogoutTimer = setTimeout(function() {
+    window.location.href = 'backend/logout.php?timeout=1';
+  }, AUTO_LOGOUT_SECONDS * 1000);
+}
+
+// Reset timer on user activity
+['mousemove', 'keydown', 'scroll', 'click'].forEach(evt => {
+  window.addEventListener(evt, resetAutoLogoutTimer);
+});
+
+// Start timer on page load
+resetAutoLogoutTimer();
+
     const bgClasses = ['bg-color-0', 'bg-color-1', 'bg-color-2', 'bg-color-3', 'bg-color-4'];
     const imageSrc = 'https://cdn-icons-png.flaticon.com/512/2991/2991108.png';
 
@@ -196,6 +231,11 @@
       $.post('backend/backend.php', { action: 'getLogFolders' }, function (response) {
         const folders = JSON.parse(response);
         const container = $('#card-container');
+
+        if (folders.error === 'timeout' || folders.error === 'not_logged_in') {
+          window.location.href = 'index.html?timeout=1';
+          return;
+        }
 
         folders.forEach((folder, i) => {
           const bgClass = bgClasses[i % bgClasses.length];

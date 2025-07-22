@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             $_SESSION['user'] = $email;
             $_SESSION['last_activity'] = time(); 
-            header("Location: ../home.html");
+            header("Location: ../home.php");
             exit;
         } else {
             header("Location: ../index.html?error=Incorrect+password");
