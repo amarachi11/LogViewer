@@ -1,3 +1,19 @@
+<?php
+session_start();
+$timeout = 7200;
+if (!isset($_SESSION['user'])) {
+    header("Location: index.html");
+    exit;
+}
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: index.html?timeout=1");
+    exit;
+}
+$_SESSION['last_activity'] = time();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +150,17 @@
   <script>
     let userTable;
 
+    function handleSessionError(response) {
+      if (response && typeof response === 'object' && (response.error === 'timeout' || response.error === 'not_logged_in')) {
+        window.location.href = 'index.html?timeout=1';
+        return true;
+      }
+      return false;
+    }
+
+
     $(document).ready(function () {
+
       userTable = $('#userTable').DataTable();
       loadUsers();
       loadPendingUsers();
@@ -148,7 +174,9 @@
         $.post('backend/backend.php', {
           action: 'updateUser',
           email, role, status
-        }, function () {
+        }, function (data) {
+          if (handleSessionError(data)) return;
+
           alert('User updated');
           closeEditOverlay();
           loadUsers();
@@ -159,6 +187,8 @@
 
     function loadUsers() {
       $.post('backend/backend.php', { action: 'getUsers' }, function (data) {
+        if (handleSessionError(data)) return;
+
         userTable.clear();
         data.forEach(user => {
           userTable.row.add([
@@ -174,6 +204,8 @@
 
     function loadPendingUsers() {
       $.post('backend/backend.php', { action: 'getPendingUsers' }, function (data) {
+        if (handleSessionError(data)) return;
+
         $('#pending-count').text(data.length);
         let html = '';
         data.forEach(user => {
@@ -193,6 +225,8 @@
 
     function approveUser(email) {
       $.post('backend/backend.php', { action: 'updateUserStatus', email, status: 'approved' }, function () {
+        if (handleSessionError(data)) return;
+
         loadUsers();
         loadPendingUsers();
       });
@@ -200,6 +234,8 @@
 
     function rejectUser(email) {
       $.post('backend/backend.php', { action: 'updateUserStatus', email, status: 'rejected' }, function () {
+        if (handleSessionError(data)) return;
+
         loadUsers();
         loadPendingUsers();
       });
@@ -207,6 +243,8 @@
 
     function editUser(email) {
       $.post('backend/backend.php', { action: 'getUser', email }, function (res) {
+        if (handleSessionError(res)) return;
+
         $('#editEmail').val(res.email);
         $('#editRole').val(res.role);
         $('#editStatus').val(res.status);

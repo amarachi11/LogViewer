@@ -1,12 +1,7 @@
 <?php
 
 session_start();
-$timeout = 60;
-
-if (!isset($_SESSION['user'])) {
-    echo json_encode(['error' => 'not_logged_in']);
-    exit;
-}
+$timeout = 7200;
 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
     session_unset();
@@ -43,18 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'getLogFolders':
             getLogFolders();
             break;
-
         case 'signupUser':
             signupUser();
             break;
-
+        case 'loginUser':
+            loginUser();
+            break;
         case 'getLogFiles':
             getLogFilesInFolder();
             break;
-
         case 'readLogFile':
             readSelectedLogFile();
-            break;
+            break;            
         case 'getUsers':
             getUsers();
             break;
@@ -70,12 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'updateUserStatus':
             updateUserStatus();
             break;
-
-
         default:
             echo json_encode(['error' => 'Invalid action']);
     }
 }
+
 
 function dbConnect()
 {
@@ -179,6 +173,62 @@ function signupUser()
     }
 }
 
+function loginUser()
+{
+
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    $password = trim($_POST['password'] ?? '');
+
+    if (!$email || !$password) {
+        echo json_encode(['status' => 'error', 'message' => 'Email and password are required.']);
+        return;
+    }
+
+    try {
+        $pdo = dbConnect();
+
+        // Check if user exists
+        $stmt = $pdo->prepare("SELECT email , password, status, role FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid email or password.']);
+            return;
+        }
+
+        if (!password_verify($password, $user['password'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid email or password.']);
+            return;
+        }
+
+        if ($user['status'] === 'pending') {
+            echo json_encode(['status' => 'error', 'message' => 'Your account is pending approval.']);
+            return;
+        }
+
+        if ($user['status'] === 'disabled') {
+            echo json_encode(['status' => 'error', 'message' => 'Your account has been disabled.']);
+            return;
+        }
+
+        // User is approved        
+        $_SESSION['user'] = $email;
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['last_activity'] = time(); 
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Login successful!',
+            'role' => $user['role'],
+            'email' => $email
+        ]);
+
+    } catch (Exception $e) {
+        error_log("Login error: " . $e->getMessage());
+        echo json_encode(['status' => 'error', 'message' => 'Login failed. Try again later.']);
+    }
+}
 
 
 function getLogFolders() {

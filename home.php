@@ -159,11 +159,11 @@ $_SESSION['last_activity'] = time();
 <body>
 
   <!-- Centered global loading spinner -->
-  <!-- <div id="ajax-loader">
+  <div id="ajax-loader">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
-  </div> -->
+  </div>
 
   <div class="container">
     <div class="d-flex justify-content-end align-items-center mt-4 mb-3">

@@ -148,6 +148,7 @@
     }
 
     $('#submit-btn').on('click', function () {
+      // alert('Button clicked');
       const email = $('#email').val().trim();
       const password = $('#password-signup').val().trim();
       const confirm = $('#confirm-password-signup').val().trim();
@@ -163,7 +164,7 @@
       }
 
       $.ajax({
-        url: 'backend/signup.php',
+        url: 'backend/backend.php',
         method: 'POST',
         dataType: 'json',
         data: {
